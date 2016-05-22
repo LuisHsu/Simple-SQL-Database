@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>資料庫管理程式</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QGridLayout" name="gridLayout" columnstretch="1,3">
+    <item row="2" column="1">
+     <widget class="QPlainTextEdit" name="plainTextEdit"/>
+    </item>
+    <item row="1" column="1">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>SQL查詢</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QLabel" name="label_3">
+      <property name="text">
+       <string>查詢結果</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QPushButton" name="pushButton">
+      <property name="text">
+       <string>查詢</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>資料表</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_4">
+      <property name="text">
+       <string>資料庫</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0" rowspan="2">
+     <widget class="QListWidget" name="DBListWidget">
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::SingleSelection</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="0">
+     <widget class="QLabel" name="label_5">
+      <property name="text">
+       <string>欄位</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0">
+     <widget class="QListWidget" name="TableListWidget"/>
+    </item>
+    <item row="7" column="0">
+     <widget class="QListWidget" name="FieldListWidget"/>
+    </item>
+    <item row="5" column="1" rowspan="3">
+     <widget class="QTableView" name="tableView"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="nativeMenuBar">
+    <bool>false</bool>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>資料表</string>
+    </property>
+    <addaction name="table_create_action"/>
+    <addaction name="table_load_action"/>
+   </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>資料庫</string>
+    </property>
+    <addaction name="db_create_action"/>
+    <addaction name="db_delete_action"/>
+   </widget>
+   <addaction name="menu_2"/>
+   <addaction name="menu"/>
+  </widget>
+  <action name="table_load_action">
+   <property name="text">
+    <string>匯入資料表</string>
+   </property>
+  </action>
+  <action name="db_create_action">
+   <property name="text">
+    <string>建立資料庫</string>
+   </property>
+  </action>
+  <action name="db_delete_action">
+   <property name="text">
+    <string>刪除選取的資料庫</string>
+   </property>
+  </action>
+  <action name="table_create_action">
+   <property name="text">
+    <string>建立資料表</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>
