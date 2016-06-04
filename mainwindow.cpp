@@ -11,7 +11,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->table_create_action,SIGNAL(triggered(bool)),this,SLOT(table_create_slot(bool)));
     connect(ui->table_load_action,SIGNAL(triggered(bool)),this,SLOT(table_load_slot(bool)));
     connect(ui->DBListWidget,SIGNAL(currentRowChanged(int)),this,SLOT(update_tables(int)));
+    connect(ui->DBListWidget,SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(update_manipulators(QListWidgetItem*)));
     connect(ui->TableListWidget,SIGNAL(currentRowChanged(int)),this,SLOT(update_fields(int)));
+    connect(ui->QueryButton,SIGNAL(clicked(bool)),this,SLOT(query_click(bool)));
 
     // Load Databases
     QDir dbRoot(QApplication::applicationDirPath()+"/Databases");
@@ -28,11 +30,25 @@ MainWindow::MainWindow(QWidget *parent) :
     }else{
         QDir().mkdir(QApplication::applicationDirPath()+"/Databases");
     }
+    // Set Lexer
+    sqlLexer = new QsciLexerSQL;
+    QFont font;
+    font.setPointSize(12);
+    sqlLexer->setDefaultFont(font);
+    sqlLexer->setAutoIndentStyle(1);
+    ui->textEdit->setLexer(sqlLexer);
+    ui->textEdit->setWrapMode(QsciScintilla::WrapWord);
+    ui->textEdit->setMarginsFont(font);
+    ui->textEdit->setMarginWidth(0,QFontMetrics(font).width("000")+6);
+    ui->textEdit->setMarginLineNumbers(0,true);
+    // Set result table
+    ui->ResultView->setModel(new QStandardItemModel);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete sqlLexer;
     foreach (DBDesc *db, dbList) {
         delete db;
     }
@@ -54,6 +70,22 @@ void MainWindow::update_tables(int row)
     }
 }
 
+void MainWindow::update_manipulators(QListWidgetItem *item)
+{
+    if(!ui->DBListWidget->selectedItems().isEmpty()){
+        cleanManipulator();
+        foreach (DBDesc *dbDesc, dbList) {
+            if(dbDesc->name == item->text()){
+                foreach (QJsonValue table, dbDesc->desc->document.object().value("tables").toArray()) {
+                    QString tableName = table.toObject().value("name").toString();
+                    loadManipulator(dbDesc,tableName);
+                }
+                break;
+            }
+        }
+    }
+}
+
 void MainWindow::update_fields(int row)
 {
     while (ui->FieldListWidget->count() > 0) {
@@ -68,6 +100,22 @@ void MainWindow::update_fields(int row)
         newItem->setText(field.toString());
         ui->FieldListWidget->addItem(newItem);
     }
+}
+
+void MainWindow::query_click(bool)
+{
+    QueryExecuter executer;
+    ui->ResultTextbrowser->setText(query(ui->textEdit->text(),executer)+"</br>");
+    QStandardItemModel *resModel = (QStandardItemModel *)ui->ResultView->model();
+    resModel->clear();
+    resModel->setHorizontalHeaderLabels(executer.fieldList);
+    for(int i=0; i<executer.datas.size(); ++i){
+        resModel->insertRow(i);
+        for(int j=0; j<executer.datas.at(i).size(); ++j){
+            resModel->setData(resModel->index(i,j),executer.datas.at(i).at(j));
+        }
+    }
+    ui->ResultView->resizeColumnsToContents();
 }
 
 void MainWindow::db_create_slot(bool)

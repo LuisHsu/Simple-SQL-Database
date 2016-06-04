@@ -85,6 +85,9 @@ void LoadTableDialog::loadTable()
     }
     // Insert data
     while(!textStream.atEnd()){
-        insertData(dbDesc, tableName, textStream.readLine());
+        QString line = textStream.readLine();
+        if(!line.isEmpty()){
+            insertData(dbDesc, tableName, line);
+        }
     }
 }
