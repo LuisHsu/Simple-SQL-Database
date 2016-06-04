@@ -6,7 +6,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
-#include <QApplication>
+#include <QCoreApplication>
 #include <QDataStream>
 #include <QMap>
 #include <QRegularExpression>
@@ -95,6 +95,7 @@ public:
 
 void insertData(DBDesc *dbDesc, QString tableName, QString data);
 void cleanManipulator();
+QMap<QString,Manipulator *> *getManipulator();
 void loadManipulator(DBDesc *dbDesc, QString tableName);
 QString query(QString qryStr, QueryExecuter &executer);
 int hash33(QString key, int bucketCount);

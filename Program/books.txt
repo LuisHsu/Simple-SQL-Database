@@ -1,0 +1,12 @@
+/* isbn|author|title|price|subject */
+439139597|J. K. Rowling|Harry Potter and the goblet of fire|25.95|CHILDREN
+439064864|J. K. Rowling|Harry Potter and the chambers of secrets|17.95|CHILDREN
+439136350|J. K. Rowling|Harry Potter and the chamber of secrets|19.95|CHILDREN
+345350499|Marion Zimmer Bradley|The mists of avalon|12.95|FICTION
+395851580|James Marshall|George and Martha the complete stories of two best friends|25|CHILDREN
+375810609|Jean DE Brunhoff|Bonjour Babar|29.95|CHILDREN
+345337662|Anne Rice|Interview with a vampire|6.99|FICTION
+345377648|Anne Rice|Lasher|14|FICTION
+345313860|Anne Rice|The vampire lestat|6.99|FICTION
+042510107X| Tom Clancy|Red Storm Rising|7.99|FICTION
+034538475X|Anne Rice|The tale of the body thief|6.99|FICTION

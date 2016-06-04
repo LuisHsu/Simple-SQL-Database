@@ -76,7 +76,7 @@ Manipulator::Manipulator(DBDesc *dbDesc, QString tableName):name(tableName),dbNa
     QJsonArray tableArr = dbDesc->desc->document.object().value("tables").toArray();
     QJsonArray fields;
     // Get fields
-    QString tablePath = QApplication::applicationDirPath()+"/Databases/"+dbDesc->name+"/"+tableName;
+    QString tablePath = QCoreApplication::applicationDirPath()+"/Databases/"+dbDesc->name+"/"+tableName;
     for(int i=0; i<tableArr.count(); ++i){
         if(tableArr.at(i).toObject().value("name").toString() == name){
             fields = tableArr.at(i).toObject().value("fields").toArray();
@@ -176,7 +176,7 @@ void cleanManipulator()
     foreach (QString key, manipulators.keys()) {
         Manipulator *manipulator = manipulators[key];
         foreach(QString field, manipulator->fieldNames){
-            QFile fieldFile(QApplication::applicationDirPath()+"/Databases/"+
+            QFile fieldFile(QCoreApplication::applicationDirPath()+"/Databases/"+
                             manipulator->dbName+"/"+
                             manipulator->name+"/"+
                             field+".field");
@@ -353,9 +353,6 @@ QString QueryLexer::lex(QString qryStr)
         fields.push_back(field);
     }
     fields.removeDuplicates();
-    if(isDistinct && (fields.size() > 1)){
-        errStr += "<h4 style=\"color:orange;\">警告：SQL不支援多欄位 'distinct'，只有第一個欄位才會具有唯一值</h4>";
-    }
     // Split table
     foreach (QString table, tableStr.split(',')){
         table = table.trimmed();
@@ -671,7 +668,12 @@ QString QueryParser::parse(QStringList &conditions)
     // Generate return instruction
     Instruction retIns;
     retIns.operation = RET;
-    retIns.regs[0] = datas.takeLast();
+    if(!conditions.isEmpty()){
+        retIns.regs[0] = datas.takeLast();
+    }else{
+        retIns.regs[0].type = RESULT;
+        retIns.regs[0].value = "All";
+    }
     instructions.push_back(retIns);
     return "";
 }
@@ -988,7 +990,14 @@ QString QueryExecuter::execute(QueryLexer &lex, JoinParser &joinParser, QueryPar
             delete reg2;
         }
         if(instruction.operation == RET){
-            res = regs.at(instruction.regs[0].value.toInt()-1);
+            if(instruction.regs[0].value == "All"){
+                QList<QList<int>*> *newReg = new QList<QList<int>*>;
+                newReg->push_back(new QList<int>);
+                newReg->push_back(new QList<int>);
+                res = newReg;
+            }else{
+                res = regs.at(instruction.regs[0].value.toInt()-1);
+            }
         }
     }
     // Remove unqualified data
@@ -1047,6 +1056,25 @@ QString QueryExecuter::execute(QueryLexer &lex, JoinParser &joinParser, QueryPar
         }
         dataFile.close();
         tagIndex = fieldSize;
+    }
+    // Distinct
+    if(lex.isDistinct){
+        QStringList pool[fieldList.size()];
+        for(int i=0; i<datas.size();){
+            int countRep = 0;
+            for(int j=0; j<fieldList.size(); ++j){
+                if(!pool[j].contains(datas.at(i).at(j))){
+                    pool[j].push_back(datas.at(i).at(j));
+                }else{
+                    ++countRep;
+                }
+            }
+            if(countRep == fieldList.size()){
+                datas.removeAt(i);
+            }else{
+                ++i;
+            }
+        }
     }
     return "";
 }
@@ -1139,7 +1167,7 @@ QString JoinParser::check(QueryLexer &)
             isError = true;
             continue;
         }
-        if(!manipulators[table]->fieldNames.contains(field.split('.').at(1))){
+        if((field.split('.').size() > 1) && !manipulators[table]->fieldNames.contains(field.split('.').at(1))){
             errStr += "<h4 style=\"color:red;\">錯誤："+table+"資料表內不存在"+field.split('.').at(1)+"欄位</h4>";
             fields.removeOne(field);
             isError = true;
@@ -1177,4 +1205,9 @@ QString stringToToken(QString table, QString str)
     }else{
         return QString::number(retHash) + "_" + QString::number(retOffset);
     }
+}
+
+QMap<QString, Manipulator *> *getManipulator()
+{
+    return &manipulators;
 }
