@@ -4,6 +4,7 @@
 
 #### 必備條件
 * Qt 5.6.0
+* QScintilla
 
 #### 編譯指令
     qmake
